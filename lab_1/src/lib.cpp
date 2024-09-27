@@ -8,7 +8,7 @@
 #include <sys/wait.h>
 #include <vector>
 
-void StartProcess(int * pipe, const std::string& childPath, std::string& filePath) {
+bool StartProcess(int * pipe, const std::string& childPath, std::string& filePath) {
     pid_t pid = fork();
     if (pid == ERROR){
         perror("Can't fork process");
@@ -23,6 +23,8 @@ void StartProcess(int * pipe, const std::string& childPath, std::string& filePat
             std::cout << "Something went wrong when creating process " << childPath << std::endl;
         }
     }
+
+    return pid == CHILD_PROCESS;
 }
 
 int ParentMain(){
@@ -45,11 +47,11 @@ int ParentMain(){
         else less.append(str + '\n');
     }
 
-    StartProcess(pipe_to_child_2, CHILD_2_PATH, fName2);
+    if (StartProcess(pipe_to_child_2, CHILD_2_PATH, fName2)) return 0;
     write(pipe_to_child_2[WRITE_END], more.c_str(), more.length());
     close(pipe_to_child_2[WRITE_END]);
 
-    StartProcess(pipe_to_child_1, CHILD_1_PATH, fName1);
+    if (StartProcess(pipe_to_child_1, CHILD_1_PATH, fName1)) return 0;
     write(pipe_to_child_1[WRITE_END], less.c_str(), less.length());
     close(pipe_to_child_1[WRITE_END]);
 
