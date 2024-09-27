@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <csignal>
 #include "utils.h"
 #include "constants.h"
 
@@ -12,7 +13,12 @@ int main(int argv, char ** argc) {
         strs[i++] = Modify(str);
     }
 
-    std::ofstream outfile (argc[READ_END]);
-    outfile << Concat(strs) << std::endl;
-    outfile.close();
+    FILE * file = fopen(argc[0], "w");
+    dup2(fileno(file),1) ;
+
+    auto str = Concat(strs);
+    write(1, str.c_str(), str.size());
+
+    fclose(file);
+    close(1);
 }

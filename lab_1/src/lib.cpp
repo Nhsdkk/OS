@@ -25,20 +25,12 @@ void StartProcess(int * pipe, const std::string& childPath, std::string& filePat
     }
 }
 
-void OpenPipe(int *p) {
-    if (pipe(p) == ERROR){
-        perror("Can't open pipe");
-        exit(ERROR);
-    }
-}
-
 int ParentMain(){
     int pipe_to_child_1[2];
     OpenPipe(pipe_to_child_1);
 
     int pipe_to_child_2[2];
     OpenPipe(pipe_to_child_2);
-
 
     std::string fName1, fName2;
 

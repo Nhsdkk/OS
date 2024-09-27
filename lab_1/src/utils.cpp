@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <csignal>
 
 #include "utils.h"
 #include "constants.h"
@@ -13,7 +14,7 @@ std::vector<std::string> ReadData(){
 
 
     while (std::getline(std::cin, buff)){
-        strings.push_back(buff);
+        if (!buff.empty()) strings.push_back(buff);
     }
 
     return strings;
@@ -37,4 +38,11 @@ std::string Modify(const std::string& str){
     }
 
     return res;
+}
+
+void OpenPipe(int *p) {
+    if (pipe(p) == ERROR){
+        perror("Can't open pipe");
+        exit(ERROR);
+    }
 }
