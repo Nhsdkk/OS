@@ -1,20 +1,18 @@
 #include <string>
-#include <iostream>
 #include <vector>
 #include <csignal>
+#include <fstream>
 
 #include "utils.h"
 #include "constants.h"
 
 const std::string vowels = "aeiouy";
 
-void ReadData(std::function<void(const std::string&)> handler){
-    std::vector<std::string> strings;
+void ReadData(const std::function<void(const std::string&)>& handler, std::basic_istream<char>& stream){
     std::string buff;
 
-
-    while (std::getline(std::cin, buff)){
-        if (!buff.empty()) handler(buff + '\n');
+    while (std::getline(stream, buff)){
+        handler(buff + '\n');
     }
 }
 

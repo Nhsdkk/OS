@@ -6,9 +6,17 @@
 #include "utils.h"
 #include "constants.h"
 #include <sys/wait.h>
+#include <fstream>
+
+std::string GetFileName(std::istream& stream){
+    std::string buff;
+    std::getline(stream, buff);
+    return buff;
+}
 
 bool StartProcess(int * pipe, const std::string& childPath, std::string& filePath) {
     pid_t pid = fork();
+
     if (pid == ERROR){
         perror("Can't fork process");
         exit(ERROR);
@@ -26,7 +34,7 @@ bool StartProcess(int * pipe, const std::string& childPath, std::string& filePat
     return pid == CHILD_PROCESS;
 }
 
-int ParentMain(){
+void ParentMain(std::istream& input){
     int pipe_to_child_1[2];
     OpenPipe(pipe_to_child_1);
 
@@ -36,27 +44,29 @@ int ParentMain(){
     std::string fName1, fName2;
 
     std::cout << "Enter filename for 1 process: " << std::endl;
-    std::cin >> fName1;
+    fName1 = GetFileName(input);
 
     std::cout << "Enter filename for 2 process: " << std::endl;
-    std::cin >> fName2;
+    fName2 = GetFileName(input);
 
-    if (StartProcess(pipe_to_child_2, CHILD_2_PATH, fName2)) return 0;
-    if (StartProcess(pipe_to_child_1, CHILD_1_PATH, fName1)) return 0;
+    std::cout << "FILE NAMES: "<< fName1 << " " << fName2 << std::endl;
+
+    if (StartProcess(pipe_to_child_2, CHILD_2_PATH, fName2)) return;
+    if (StartProcess(pipe_to_child_1, CHILD_1_PATH, fName1)) return;
 
     std::cout << "Enter strings to process: " << std::endl;
 
     ReadData([pipe_to_child_1, pipe_to_child_2](const std::string& str) {
         if (str.length() > MAX_STRING_LENGTH) write(pipe_to_child_2[WRITE_END], str.c_str(), str.size());
         else write(pipe_to_child_1[WRITE_END], str.c_str(), str.size());
-    });
+    }, input);
+
+    close(pipe_to_child_2[READ_END]);
+    close(pipe_to_child_1[READ_END]);
 
     close(pipe_to_child_2[WRITE_END]);
     close(pipe_to_child_1[WRITE_END]);
 
     wait(nullptr);
     wait(nullptr);
-
-
-    return 0;
 }

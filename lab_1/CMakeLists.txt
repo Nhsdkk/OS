@@ -19,5 +19,11 @@ target_link_libraries(lab_1 PRIVATE utils constants src)
 target_link_libraries(child1 PRIVATE utils constants)
 target_link_libraries(child2 PRIVATE utils constants)
 
-
 add_dependencies(lab_1 child1 child2)
+
+add_executable(lab_1_tests tests/test.cpp)
+add_dependencies(lab_1_tests child1 child2)
+target_link_libraries(lab_1_tests PRIVATE src utils gtest_main)
+
+enable_testing()
+add_test(NAME lab_1_tests COMMAND LW1_test)

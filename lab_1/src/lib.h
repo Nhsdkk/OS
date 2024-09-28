@@ -1,3 +1,5 @@
 #pragma once
 
-int ParentMain();
+#include <fstream>
+
+void ParentMain(std::basic_istream<char>& input);
