@@ -2,8 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
-std::string Concat(std::vector<std:: string>& strings, char sep = '\n');
-std::vector<std::string> ReadData();
+void ReadData(std::function<void(const std::string&)> handler);
 std::string Modify(const std::string& str);
 void OpenPipe(int *p);

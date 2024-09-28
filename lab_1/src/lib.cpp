@@ -6,7 +6,6 @@
 #include "utils.h"
 #include "constants.h"
 #include <sys/wait.h>
-#include <vector>
 
 bool StartProcess(int * pipe, const std::string& childPath, std::string& filePath) {
     pid_t pid = fork();
@@ -42,22 +41,17 @@ int ParentMain(){
     std::cout << "Enter filename for 2 process: " << std::endl;
     std::cin >> fName2;
 
-    std::cout << "Enter strings to process: " << std::endl;
-    std::vector<std::string> data = ReadData();
-
-    std::string more, less;
-
-    for (const std::string& str : data){
-        if (str.length() > MAX_STRING_LENGTH) more.append(str + '\n');
-        else less.append(str + '\n');
-    }
-
     if (StartProcess(pipe_to_child_2, CHILD_2_PATH, fName2)) return 0;
-    write(pipe_to_child_2[WRITE_END], more.c_str(), more.length());
-    close(pipe_to_child_2[WRITE_END]);
-
     if (StartProcess(pipe_to_child_1, CHILD_1_PATH, fName1)) return 0;
-    write(pipe_to_child_1[WRITE_END], less.c_str(), less.length());
+
+    std::cout << "Enter strings to process: " << std::endl;
+
+    ReadData([pipe_to_child_1, pipe_to_child_2](const std::string& str) {
+        if (str.length() > MAX_STRING_LENGTH) write(pipe_to_child_2[WRITE_END], str.c_str(), str.size());
+        else write(pipe_to_child_1[WRITE_END], str.c_str(), str.size());
+    });
+
+    close(pipe_to_child_2[WRITE_END]);
     close(pipe_to_child_1[WRITE_END]);
 
     wait(nullptr);
