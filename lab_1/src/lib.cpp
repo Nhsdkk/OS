@@ -36,8 +36,13 @@ int ParentMain(){
 
     std::string fName1, fName2;
 
-    std::cin >> fName1 >> fName2;
+    std::cout << "Enter filename for 1 process: " << std::endl;
+    std::cin >> fName1;
 
+    std::cout << "Enter filename for 2 process: " << std::endl;
+    std::cin >> fName2;
+
+    std::cout << "Enter strings to process: " << std::endl;
     std::vector<std::string> data = ReadData();
 
     std::string more, less;
