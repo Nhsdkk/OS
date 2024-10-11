@@ -2,6 +2,7 @@
 #include <vector>
 #include <csignal>
 #include <fstream>
+#include <iostream>
 
 #include "utils.h"
 #include "constants.h"
@@ -12,6 +13,9 @@ void ReadData(const std::function<void(const std::string&)>& handler, std::basic
     std::string buff;
 
     while (std::getline(stream, buff)){
+        if (buff.empty()){
+            return;
+        }
         handler(buff + '\n');
     }
 }

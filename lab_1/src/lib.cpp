@@ -61,6 +61,9 @@ void ParentMain(std::istream& input){
         else write(pipe_to_child_1[WRITE_END], str.c_str(), str.size());
     }, input);
 
+    write(pipe_to_child_1[WRITE_END], "\n", 1);
+    write(pipe_to_child_2[WRITE_END], "\n", 1);
+
     close(pipe_to_child_2[READ_END]);
     close(pipe_to_child_1[READ_END]);
 

@@ -32,14 +32,15 @@ TEST(Should_ReturnTheSameString_When_StringDoesNotContainVowels, utils_test){
 }
 
 TEST(Should_WriteToRightFile, main_test){
-    std::array<std::string, 7> data = {
+    std::array<std::string, 8> data = {
         "file1.txt",
         "file2.txt",
         "qwerty",
         "qqqqqqqqqqwerty",
         "pipe",
         "very long woooord",
-        "many long words here"
+        "many long words here",
+        "\n"
     };
 
     std::string expectedResult2 = "qqqqqqqqqqwrt\nvr lng wrd\nmn lng wrds hr\n";
