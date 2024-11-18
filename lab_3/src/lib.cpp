@@ -45,8 +45,6 @@ void ParentMain(std::istream& input){
     std::cout << "Enter filename for 2 process: " << std::endl;
     fName2 = GetFileName(input);
 
-    std::cout << "FILE NAMES: "<< fName1 << " " << fName2 << std::endl;
-
     if (StartProcess(CHILD_2_PATH, fName2)) return;
     if (StartProcess(CHILD_1_PATH, fName1)) return;
 
@@ -67,13 +65,11 @@ void ParentMain(std::istream& input){
 
         if (buff.length() > MAX_STRING_LENGTH) {
             handlerChild2.Write(buff + '\n');
-            std::cout << handlerChild2.Read();
             handlerChild2.UnlockChild();
             handlerChild2.LockParent();
         }
         else {
             handlerChild1.Write(buff + '\n');
-            std::cout << handlerChild1.Read();
             handlerChild1.UnlockChild();
             handlerChild1.LockParent();
         }
