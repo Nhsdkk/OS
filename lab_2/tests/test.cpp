@@ -35,7 +35,7 @@ void copyArray(const long* in, long* dest, size_t size){
 }
 
 TEST(SyncTests, Should_SortSyncronouslyCorrectly){
-    auto size = 1000;
+    const auto size = 1000;
     auto values = static_cast<long*>(std::malloc(sizeof(long) * size));
     generateArray(values, size);
     timsort::sort(values, size);
@@ -44,7 +44,7 @@ TEST(SyncTests, Should_SortSyncronouslyCorrectly){
 }
 
 TEST(SyncAsyncTests, Should_ReturnSameValuesForSyncAndAsyncVersions){
-    auto size = 1000;
+    const auto size = 1000;
     auto values = static_cast<long*>(std::malloc(sizeof(long) * size));
     auto values1 = static_cast<long*>(std::malloc(sizeof(long) * size));
     generateArray(values, size);
@@ -52,7 +52,7 @@ TEST(SyncAsyncTests, Should_ReturnSameValuesForSyncAndAsyncVersions){
 
 
     timsort::sort(values, size);
-    timsort::sortAsync(values1, size);
+    timsort::sortAsync(values1, size, 8);
 
     EXPECT_TRUE(arrayEq(values, values1, size));
 
@@ -61,7 +61,7 @@ TEST(SyncAsyncTests, Should_ReturnSameValuesForSyncAndAsyncVersions){
 }
 
 TEST(SyncAsyncTests, Should_SortSyncronouslyFaster){
-    auto size = 100000;
+    const auto size = 100000;
     auto values = static_cast<long*>(std::malloc(sizeof(long) * size));
     auto values1 = static_cast<long*>(std::malloc(sizeof(long) * size));
     generateArray(values, size);
@@ -74,12 +74,10 @@ TEST(SyncAsyncTests, Should_SortSyncronouslyFaster){
     auto sync = std::chrono::duration_cast<std::chrono::microseconds>(endSync - startSync);
 
     const auto startAsync{std::chrono::high_resolution_clock::now()};
-    timsort::sortAsync(values1, size);
+    timsort::sortAsync(values1, size, 8);
     const auto endAsync{std::chrono::high_resolution_clock::now()};
 
     auto async = std::chrono::duration_cast<std::chrono::microseconds>(endAsync - startAsync);
-
-    std::cout << sync.count() - async.count() << std::endl;
 
     EXPECT_TRUE(arrayEq(values, values1, size));
     EXPECT_TRUE(async < sync);

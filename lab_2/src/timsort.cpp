@@ -5,7 +5,6 @@
 #include <tuple>
 #include <semaphore>
 
-const size_t minRun = 15;
 const int THREAD_SIZE = 4;
 
 sem_t sem;
@@ -40,13 +39,14 @@ namespace timsort {
 //        return array_size + f;
 //    }
 
-    void getSplits(std::queue<std::pair<size_t, size_t>>* splits, size_t size) {
+    size_t getSplits(std::queue<std::pair<size_t, size_t>>* splits, size_t size, size_t threads = 8) {
         size_t curI = 0;
         while (curI < size){
-            auto next = std::min(size, curI + minRun );
+            auto next = std::min(size, curI + size / threads );
             splits->emplace(curI, next);
             curI = next;
         }
+        return size / threads;
     }
 
     void move(std::vector<long>& values, long start, long end){
@@ -57,7 +57,7 @@ namespace timsort {
     }
 
     void insertionSort(long* values, size_t start, size_t end) {
-        auto v = std::vector<long>(minRun);
+        auto v = std::vector<long>(end - start);
         auto sz = 0;
 
         for (auto cur = start; cur < end; ++cur){
@@ -86,7 +86,7 @@ namespace timsort {
         auto p = static_cast<InsertParams*>(params);
         insertionSort(p->values, p->start, p->end);
         std::free(params);
-        sem_post(&sem);
+//        sem_post(&sem);
         return nullptr;
     }
 
@@ -130,22 +130,20 @@ namespace timsort {
         auto p = static_cast<MergeParams*>(params);
         mergeSort(p->values, p->start1, p->end1, p->start2, p->end2);
         std::free(params);
-        sem_post(&sem);
+//        sem_post(&sem);
         return nullptr;
     }
 
     void sort(long *values, size_t size) {
         std::queue<std::pair<size_t, size_t>> splits;
 
-        getSplits(&splits, size);
+        auto mergeSize = getSplits(&splits, size);
 
         while (!splits.empty()){
             auto p = splits.front();
             splits.pop();
             insertionSort(values, p.first, p.second);
         }
-
-        auto mergeSize = minRun;
 
         while (mergeSize <= size){
             for (size_t start = 0; start < size; start += 2 * mergeSize) {
@@ -161,11 +159,11 @@ namespace timsort {
         }
     }
 
-    void sortAsync(long *values, size_t size) {
+    void sortAsync(long *values, size_t size, size_t thr) {
         std::queue<std::pair<size_t, size_t>> splits;
         sem_init(&sem, 0, THREAD_SIZE);
 
-        getSplits(&splits, size);
+        auto mergeSize = getSplits(&splits, size, thr);
 
         pthread_t threads[splits.size()];
 
@@ -173,9 +171,8 @@ namespace timsort {
         int semVal;
 
         while (!splits.empty()){
-            sem_wait(&sem);
+//            sem_wait(&sem);
             sem_getvalue(&sem, &semVal);
-            std::cout << semVal << std::endl;
             auto p = splits.front();
             splits.pop();
             auto params = new InsertParams{values, p.first, p.second};
@@ -187,8 +184,6 @@ namespace timsort {
             pthread_join(threads[j], nullptr);
         }
 
-        auto mergeSize = minRun;
-
         while (mergeSize <= size){
             threadCount = 0;
             for (size_t start = 0; start < size; start += 2 * mergeSize) {
@@ -196,7 +191,7 @@ namespace timsort {
                 size_t end = std::min(start + 2 * mergeSize, size);
 
                 if (mid < end) {
-                    sem_wait(&sem);
+//                    sem_wait(&sem);
                     auto params = new MergeParams{ values, start, mid, mid, end };
                     pthread_create(&threads[threadCount], nullptr, mergeSortThread, params);
                     ++threadCount;

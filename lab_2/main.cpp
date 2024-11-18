@@ -12,7 +12,7 @@ int main(int argc, char** argv){
     std::mt19937 mt(rd());
     std::uniform_int_distribution<long> dist(1, 20);
 
-    size_t size = 24;
+    size_t size = 101;
     auto values = static_cast<long*>(std::malloc(sizeof(long) * size));
     for (auto i = 0; i < size; ++i){
         values[i] = dist(mt);
@@ -24,7 +24,7 @@ int main(int argc, char** argv){
 
     std::cout << std::endl;
 
-    timsort::sortAsync(values, size);
+    timsort::sortAsync(values, size, std::atol(argv[1]));
 
     for (auto i = 0; i < size; ++i){
         std::cout << values[i] << " ";
