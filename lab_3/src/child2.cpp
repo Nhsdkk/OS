@@ -8,7 +8,15 @@ int main(int argv, char ** argc){
     auto handlerChild = SharedObjectHandler(CHILD_2_OBJECT_NAME,  CHILD_2_OBJECT_NAME);
 
     FILE * file = fopen(argc[0], "w");
-    dup2(fileno(file), 1);
+    if (!file){
+        perror("Can't open file");
+        return -1;
+    }
+
+    if (dup2(fileno(file), 1) == -1){
+        perror("Can't redirect output");
+        return -1;
+    }
 
     std::string data;
 

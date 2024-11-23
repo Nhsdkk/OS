@@ -13,7 +13,10 @@ int main(int argv, char ** argc) {
         return -1;
     }
 
-    dup2(fileno(file), 1);
+    if (dup2(fileno(file), 1) == -1){
+        perror("Can't redirect output");
+        return -1;
+    }
 
     std::string data;
 
