@@ -13,7 +13,7 @@ class SharedObjectHandler {
     sem_t* semChild;
     sem_t* semParent;
     char* buffer;
-    size_t bufferSize;
+    const size_t bufferSize;
     std::string semNameChild, semNameParent, objectName;
 
     public:
@@ -28,7 +28,7 @@ class SharedObjectHandler {
 
         std::string Read();
 
-        void Write(const std::string& data) const;
+        void Write(const std::string& data);
 
         void LockParent();
         void LockChild();

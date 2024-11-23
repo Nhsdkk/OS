@@ -17,11 +17,10 @@ SharedObjectHandler::SharedObjectHandler(
     const int prot,
     const bool exists,
     const size_t sz
-) {
+): bufferSize(sz){
     auto fd = OpenSharedMemory(objName, exists, fdMode, sz);
     buffer = static_cast<char*>(mmap(nullptr, sz, prot, MAP_SHARED, fd, 0));
-    if (buffer == (char*)(-1))
-    bufferSize = sz;
+    if (buffer == (char*)(-1)) perror("Error while creating buffer.");
     semNameChild = sNameChild;
     semNameParent = sNameChild + "_parent";
     objectName = objName;
@@ -35,7 +34,7 @@ std::string SharedObjectHandler::Read() {
     return buff;
 }
 
-void SharedObjectHandler::Write(const std::string &data) const {
+void SharedObjectHandler::Write(const std::string &data) {
     if (data.size() >= bufferSize) perror("Buffer overflow");
     strcpy(buffer, data.c_str());
 }
