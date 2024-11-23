@@ -37,5 +37,4 @@ int main(int argv, char ** argc){
     }
 
     fclose(file);
-    close(1);
 }
