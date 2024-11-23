@@ -24,8 +24,8 @@ SharedObjectHandler::SharedObjectHandler(
     semNameChild = sNameChild;
     semNameParent = sNameChild + "_parent";
     objectName = objName;
-    semChild = sem_open(semNameChild.c_str(), O_CREAT, O_RDWR , 0);
-    semParent = sem_open(semNameParent.c_str(), O_CREAT, O_RDWR , 0);
+    semChild = sem_open(semNameChild.c_str(), O_CREAT, 0666 , 0);
+    semParent = sem_open(semNameParent.c_str(), O_CREAT, 0666 , 0);
     if (semChild == SEM_FAILED || semParent == SEM_FAILED) perror("Some semaphores can't be constructed");
 }
 
