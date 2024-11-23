@@ -21,35 +21,35 @@ void RemoveIfExists(const std::string& filename){
     if (std::filesystem::exists(filename)) std::filesystem::remove(filename);
 }
 
-TEST(Should_RemoveAllVowels_When_StringContainsVowels, utils_test){
+TEST(UtilsTest, ShouldRemoveAllVowelsWhenStringContainsVowels){
     std::string str = "qweyiaeiouywwwwwtplk";
-    ASSERT_EQ("qwwwwwwtplk", Modify(str));
+    EXPECT_EQ("qwwwwwwtplk", Modify(str));
 }
 
-TEST(Should_ReturnTheSameString_When_StringDoesNotContainVowels, utils_test){
-    std::string str = "qwwwwwwtplk";
-    ASSERT_EQ("qwwwwwwtplk", Modify(str));
+TEST(UtilsTest, ShouldReturnTheSameStringWhenStringDoesNotContainVowels){
+    const std::string str = "qwwwwwwtplk";
+    EXPECT_EQ("qwwwwwwtplk", Modify(str));
 }
 
 TEST(Should_WriteToRightFile, main_test){
-    std::array<std::string, 8> data = {
-        "file1.txt",
-        "file2.txt",
-        "qwerty",
-        "qqqqqqqqqqwerty",
-        "pipe",
-        "very long woooord",
-        "many long words here",
+    const std::array<std::string, 8> data = {
+        "file1.txt\n",
+        "file2.txt\n",
+        "qwerty\n",
+        "qqqqqqqqqqwerty\n",
+        "pipe\n",
+        "very long woooord\n",
+        "many long words here\n",
         "\n"
     };
 
-    std::string expectedResult2 = "qqqqqqqqqqwrt\nvr lng wrd\nmn lng wrds hr\n";
-    std::string expectedResult1 = "qwrt\npp\n";
+    const std::string expectedResult2 = "qqqqqqqqqqwrt\nvr lng wrd\nmn lng wrds hr\n";
+    const std::string expectedResult1 = "qwrt\npp\n";
 
     FILE* iFile = fopen(INPUT_FILE_NAME, "w");
 
-    for (auto &item : data) {
-        write(fileno(iFile), (item + '\n').c_str(), item.size() + 1);
+    for (const auto &item : data) {
+        write(fileno(iFile), (item).c_str(), item.size());
     }
 
     fclose(iFile);
@@ -58,17 +58,20 @@ TEST(Should_WriteToRightFile, main_test){
 
     ParentMain(inputFile);
 
-    std::ifstream file1(data[0]);
-    std::ifstream file2(data[1]);
+    const std::string fileName1 = "file1.txt";
+    const std::string fileName2 = "file2.txt";
 
-    ASSERT_TRUE(file1.good());
-    ASSERT_TRUE(file2.good());
+    std::ifstream file1(fileName1);
+    std::ifstream file2(fileName2);
 
-    std::string result1 = Read(file1);
-    std::string result2 = Read(file2);
+    EXPECT_TRUE(file1.good());
+    EXPECT_TRUE(file2.good());
 
-    ASSERT_EQ(result1, expectedResult1);
-    ASSERT_EQ(result2, expectedResult2);
+    const std::string result1 = Read(file1);
+    const std::string result2 = Read(file2);
+
+    EXPECT_EQ(result1, expectedResult1);
+    EXPECT_EQ(result2, expectedResult2);
 
     RemoveIfExists(INPUT_FILE_NAME);
     RemoveIfExists(data[0]);

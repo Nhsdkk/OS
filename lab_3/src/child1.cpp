@@ -8,6 +8,11 @@ int main(int argv, char ** argc) {
     auto handlerChild = SharedObjectHandler(CHILD_1_OBJECT_NAME, CHILD_1_OBJECT_NAME);
 
     FILE * file = fopen(argc[0], "w");
+    if (!file){
+        perror("Can't open file");
+        return -1;
+    }
+
     dup2(fileno(file), 1);
 
     std::string data;
@@ -29,5 +34,4 @@ int main(int argv, char ** argc) {
     }
 
     fclose(file);
-    close(1);
 }

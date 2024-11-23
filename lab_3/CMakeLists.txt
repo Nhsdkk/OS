@@ -8,7 +8,7 @@ add_executable(child1 src/child1.cpp)
 
 add_executable(child2 src/child2.cpp)
 
-add_library(utils src/utils.cpp src/utils.h src/SharedObjectHandler.h)
+add_library(utils src/utils.cpp src/utils.h src/SharedObjectHandler.cpp)
 add_library(constants src/constants.h)
 add_library(src src/lib.h src/lib.cpp)
 

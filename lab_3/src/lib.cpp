@@ -77,7 +77,4 @@ void ParentMain(std::istream& input){
 
     wait(nullptr);
     wait(nullptr);
-
-    handlerChild1.DestroySem();
-    handlerChild2.DestroySem();
 }

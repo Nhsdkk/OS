@@ -13,7 +13,7 @@ std::string Modify(const std::string& str){
     std::string res;
 
     for (auto& c : str){
-        if (vowels.find(c) == ERROR){
+        if (vowels.find(c) == std::string::npos){
             res += c;
         }
     }
