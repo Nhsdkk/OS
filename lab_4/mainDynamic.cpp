@@ -78,10 +78,10 @@ void* loadLib(const std::string& path){
 }
 
 int main(int argv, char** argc){
-    int command = 0;
+    auto command = 0;
 
-    void* libHandle = dlopen(pathToF1.c_str(), RTLD_LAZY);
-    bool isF1 = true;
+    auto libHandle = dlopen(pathToF1.c_str(), RTLD_LAZY);
+    auto isF1 = true;
     
     while (command != 5) {
         std::cout << "Enter command: ";
