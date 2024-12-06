@@ -3,7 +3,7 @@
 #include "../src/f1.h"
 #include "../src/f2.h"
 
-constexpr int size = 10;
+constexpr int Size = 10;
 
 std::vector<int> generateVector(const size_t vecSize){
     std::vector<int> vec(vecSize);
@@ -21,7 +21,7 @@ std::vector<int> generateVector(const size_t vecSize){
 }
 
 TEST(BubbleSortTests, ShouldSortCorrectly){
-    auto vec1 = generateVector(size);
+    auto vec1 = generateVector(Size);
 
     auto result = SortBubble(vec1);
 
@@ -30,7 +30,7 @@ TEST(BubbleSortTests, ShouldSortCorrectly){
 }
 
 TEST(HoarSortTests, ShouldSortCorrectly){
-    auto vec1 = generateVector(size);
+    auto vec1 = generateVector(Size);
 
     auto res = SortHoar(vec1);
 

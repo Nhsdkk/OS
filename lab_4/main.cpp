@@ -5,7 +5,10 @@
 #include "src/f1.h"
 #include "src/f2.h"
 
-void handlePi(const std::function<float (int)>& CalcPi, std::istream& is, std::ostream& os){
+using PiFunc = std::function<float (int)>;
+using Sorter = std::function<std::vector<int> (std::vector<int>)>;
+
+void handlePi(const PiFunc& CalcPi, std::istream& is, std::ostream& os){
     int n;
 
     os << "Enter n: ";
@@ -15,7 +18,7 @@ void handlePi(const std::function<float (int)>& CalcPi, std::istream& is, std::o
     os << "Result: " << result << std::endl;
 }
 
-void handleSort(const std::function<std::vector<int> (std::vector<int>)>& Sorter, std::istream& is, std::ostream& os){
+void handleSort(const Sorter& Sorter, std::istream& is, std::ostream& os){
     std::vector<int> vec;
     size_t size;
 

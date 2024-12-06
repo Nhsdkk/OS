@@ -10,10 +10,13 @@
 const inline std::string pathToF1 = "./libf1.so";
 const inline std::string pathToF2 = "./libf2.so";
 
-typedef float (*PiFuncPointer)(int a);
-typedef std::vector<int> (*SortFuncPointer)(std::vector<int> a);
+using PiFuncPointer = float (*)(int a);
+using SortFuncPointer = std::vector<int> (*)(std::vector<int> a);
 
-void handlePi(const std::function<float (int)>& CalcPi){
+using PiFunc = std::function<float (int)>;
+using Sorter = std::function<std::vector<int> (std::vector<int>)>;
+
+void handlePi(const PiFunc& CalcPi){
     int n;
 
     std::cout << "Enter n: ";
@@ -23,7 +26,7 @@ void handlePi(const std::function<float (int)>& CalcPi){
     std::cout << "Result: " << result << std::endl;
 }
 
-void handleSort(const std::function<std::vector<int> (std::vector<int>)>& Sorter){
+void handleSort(const Sorter& Sorter){
     std::vector<int> vec;
     size_t size;
 
