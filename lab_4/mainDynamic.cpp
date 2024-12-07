@@ -56,7 +56,6 @@ void handlePiDynamic(void* libHandle, const std::string& funcName) {
     }
 
     handlePi(pi);
-    dlclose(libHandle);
 }
 
 void handleSortDynamic(void* libHandle, const std::string& funcName) {
@@ -68,7 +67,6 @@ void handleSortDynamic(void* libHandle, const std::string& funcName) {
     }
 
     handleSort(pi);
-    dlclose(libHandle);
 }
 
 void* loadLib(const std::string& path){
