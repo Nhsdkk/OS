@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 #include "../src/Tree.h"
-#include "../src/ProcessData.h"
+#include "../src/Worker.h"
 
-TEST(BSearchTreeTests, ShouldInsertCorrectly){
-    std::array<Process::ProcessData, 5> data = {
+TEST(TreeTests, ShouldInsertCorrectly){
+    std::array<Process::Worker, 5> data = {
         Process::ProcessData(4),
         Process::ProcessData(2),
         Process::ProcessData(3),
@@ -29,8 +29,8 @@ TEST(BSearchTreeTests, ShouldInsertCorrectly){
     EXPECT_EQ(tree.getRoot()->getChildren()[1]->getChildren()[0]->getData(), data[4]);
 }
 
-TEST(BSearchTreeTests, ShouldRemoveCorrectly){
-    std::array<Process::ProcessData, 5> data = {
+TEST(TreeTests, ShouldRemoveCorrectly){
+    std::array<Process::Worker, 5> data = {
         Process::ProcessData(4),
         Process::ProcessData(2),
         Process::ProcessData(3),

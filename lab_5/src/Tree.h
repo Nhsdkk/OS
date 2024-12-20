@@ -10,34 +10,36 @@
 
 namespace Tree{
     template<class T>
-    class Node {
+    class Node : public std::enable_shared_from_this {
         T data;
         std::vector<std::shared_ptr<Node<T>>> children;
+        std::shared_ptr<Node<T>> parent;
 
         public:
-        explicit Node(const T& data) : data(data), children() {}
-        void attachNode(const T& value){
-            children.push_back(std::make_shared<Node<T>>(value));
-        }
-
-        void detachNode(const T& d) {
-            std::shared_ptr<Node<T>> value = nullptr;
-            for (auto i = 0; i < children.size(); ++i){
-                if (children[i]->getData() == d){
-                    value = children[i];
-                    break;
-                }
+            explicit Node(const T& data) : data(data), children(), parent(nullptr) {}
+            Node(const T& data, const std::shared_ptr<Node<T>>& parent) : data(data), children(), parent(parent) {}
+            void attachNode(const T& value){
+                children.push_back(std::make_shared<Node<T>>(value, this));
             }
 
-            if (value == nullptr) throw std::invalid_argument("Can't find child");
-            children.erase(std::remove(children.begin(), children.end(),value), children.end());
-        };
+            void detachNode(const T& d) {
+                std::shared_ptr<Node<T>> value = nullptr;
+                for (auto i = 0; i < children.size(); ++i){
+                    if (children[i]->getData() == d){
+                        value = children[i];
+                        break;
+                    }
+                }
 
-        T getData() { return data; }
-        std::vector<std::shared_ptr<Node<T>>> getChildren() { return children; }
-        ~Node() {
-            std::cout << "Deleting node with value "  << data.getId() << std::endl;
-        };
+                if (value == nullptr) throw std::invalid_argument("Can't find child");
+                children.erase(std::remove(children.begin(), children.end(),value), children.end());
+            };
+
+            T getData() { return data; }
+            std::vector<std::shared_ptr<Node<T>>> getChildren() { return children; }
+            ~Node() {
+                std::cout << "Deleting node with value "  << data.getId() << std::endl;
+            };
     };
 
     template<class T>
