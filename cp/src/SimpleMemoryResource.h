@@ -42,7 +42,6 @@ namespace Memory {
             SimpleMemoryResource() : blocks(), BaseMemoryResource() {}
 
             void * do_allocate(std::size_t bytes, std::size_t alignment) override {
-                std::cout << "Allocating " << bytes << " bytes with alignment " << alignment << std::endl;
                 auto [block, emplaceBlockIdx] = findPlaceToInsert(bytes, blocks);
 
                 if (emplaceBlockIdx == blocks.size()){
@@ -69,7 +68,6 @@ namespace Memory {
             }
 
             void do_deallocate(void *p, std::size_t bytes, std::size_t alignment) override {
-                std::cout << "Deallocating " << bytes << " bytes" << std::endl;
                 auto idx = 0;
                 for (auto& block : blocks){
                     if (!block.get_used()) {

@@ -73,17 +73,17 @@ std::string addPageAndGetBlock(
 }
 
 
-std::string findBlock(
+std::tuple<std::string, std::optional<size_t>> findBlock(
     std::vector<Utils::Page>& pages,
     std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     size_t size,
     size_t maxSize
 ) {
     auto existingPreSplitBlockIdx = tryFindFreeBlock(blocks.at(size));
-    if (existingPreSplitBlockIdx.has_value()) return existingPreSplitBlockIdx.value();
+    if (existingPreSplitBlockIdx.has_value()) return {existingPreSplitBlockIdx.value(), std::nullopt};
     auto existingPostSplitBlockIdx = tryFindBlockPostSplit(blocks, size, maxSize);
-    if (existingPostSplitBlockIdx.has_value()) return existingPostSplitBlockIdx.value();
-    return addPageAndGetBlock(pages, blocks, size, maxSize);
+    if (existingPostSplitBlockIdx.has_value()) return {existingPostSplitBlockIdx.value(), std::nullopt};
+    return {addPageAndGetBlock(pages, blocks, size, maxSize), maxSize};
 }
 
 void reCouple(
@@ -121,7 +121,8 @@ namespace Memory {
                 auto sz = getBlockSize(bytes);
                 if (sz > basePageSize) throw std::runtime_error("Size exceeds base page size");
 
-                auto idx = findBlock(pages, blocks, sz, basePageSize);
+                auto [idx, allocatedSize] = findBlock(pages, blocks, sz, basePageSize);
+                if (allocatedSize.has_value()) setTotalAllocatedMemory(getTotalAllocatedMemory() + allocatedSize.value());
                 auto [start, page] = blocks.at(sz).at(idx).use();
                 setTotalUsedMemory(getTotalUsedMemory() + bytes);
                 return pages[page].get() + start;
@@ -140,6 +141,8 @@ namespace Memory {
                 }
 
                 if (!idx.has_value()) throw std::runtime_error("Can't find block to free");
+
+                setTotalUsedMemory(getTotalUsedMemory() - bytes);
 
                 reCouple(blocks, idx.value(), sz, basePageSize);
             }

@@ -17,6 +17,8 @@ add_library(src
         src/TestClass.h
         src/TwinBlock.cpp
         src/TwinBlock.h
+        src/Benchmark.cpp
+        src/Benchmark.h
 )
 
 add_executable(cp main.cpp)

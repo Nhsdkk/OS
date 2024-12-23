@@ -10,7 +10,7 @@ TEST(SimpleAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
 
     std::vector<TestInternal::TestClass*> objects;
     for (auto i = 0; i < 100; ++i){
-        objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass(memory_resource));
+        objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
     std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
@@ -22,11 +22,11 @@ TEST(SimpleAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
     auto val = allocator_int.allocate(1);
 
     for (auto i = 0; i < 100 - 10; ++i){
-        objects[i] = new (allocator.allocate(1)) TestInternal::TestClass(memory_resource);
+        objects[i] = new (allocator.allocate(1)) TestInternal::TestClass();
     }
 
     for (auto i = 0; i < 100; ++i){
-        objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass(memory_resource));
+        objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
     std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
@@ -45,7 +45,7 @@ TEST(TwinAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
 
     std::vector<TestInternal::TestClass*> objects;
     for (auto i = 0; i < 100; ++i){
-        objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass(memory_resource));
+        objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
     std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
@@ -57,11 +57,11 @@ TEST(TwinAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
     auto val = allocator_int.allocate(1);
 
     for (auto i = 0; i < 100 - 10; ++i){
-        objects[i] = new (allocator.allocate(1)) TestInternal::TestClass(memory_resource);
+        objects[i] = new (allocator.allocate(1)) TestInternal::TestClass();
     }
 
     for (auto i = 0; i < 100; ++i){
-        objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass(memory_resource));
+        objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
     std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;

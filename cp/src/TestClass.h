@@ -14,14 +14,14 @@ namespace TestInternal {
     class TestClass {
         public:
             int id;
-            std::pmr::string name;
-            std::pmr::vector<int> data;
+            std::string name;
+            std::vector<int> data;
             size_t data_size;
 
-            explicit TestClass(std::pmr::memory_resource* memory_resource) {
+            TestClass() {
                 id = 1;
-                name = std::move(std::pmr::string ("HERE IS MY NAME", memory_resource));
-                data = std::pmr::vector<int>({1,2,3,4,5,6,7,8}, memory_resource);
+                name = "HERE IS MY NAME";
+                data = std::vector<int>({1,2,3,4,5,6,7,8});
                 data_size = 8;
             }
 
