@@ -13,7 +13,7 @@
 
 size_t getBlockSize(size_t requestedSize) { return static_cast<size_t>(std::pow(2, std::ceil(std::log2(requestedSize)))); }
 
-std::optional<std::string> tryFindFreeBlock(const std::map<std::string, Memory::TwinBlock>& blocks) {
+std::optional<std::string> tryFindFreeBlock(const std::unordered_map<std::string, Memory::TwinBlock>& blocks) {
     for (const auto& [key, block] : blocks){
         if (!block.getIsUsed()) return key;
     }
@@ -21,7 +21,7 @@ std::optional<std::string> tryFindFreeBlock(const std::map<std::string, Memory::
 }
 
 std::string recSplit(
-    std::map<size_t, std::map<std::string, Memory::TwinBlock>>& blocks,
+    std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     size_t curSize,
     std::string idxToSplit,
     size_t targetSize
@@ -38,7 +38,7 @@ std::string recSplit(
 }
 
 std::optional<std::string> tryFindBlockPostSplit(
-    std::map<size_t, std::map<std::string, Memory::TwinBlock>>& blocks,
+    std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     size_t targetSize,
     size_t maxSize
 ) {
@@ -60,7 +60,7 @@ std::optional<std::string> tryFindBlockPostSplit(
 
 std::string addPageAndGetBlock(
     std::vector<Utils::Page>& pages,
-    std::map<size_t, std::map<std::string, Memory::TwinBlock>>& blocks,
+    std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     size_t targetSize,
     size_t pageSize
 ) {
@@ -75,7 +75,7 @@ std::string addPageAndGetBlock(
 
 std::string findBlock(
     std::vector<Utils::Page>& pages,
-    std::map<size_t, std::map<std::string, Memory::TwinBlock>>& blocks,
+    std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     size_t size,
     size_t maxSize
 ) {
@@ -87,7 +87,7 @@ std::string findBlock(
 }
 
 void reCouple(
-    std::map<size_t, std::map<std::string, Memory::TwinBlock>>& blocks,
+    std::unordered_map<size_t, std::unordered_map<std::string, Memory::TwinBlock>>& blocks,
     std::string blockToFreeIdx,
     size_t size,
     size_t maxSize
@@ -109,7 +109,7 @@ namespace Memory {
 
     template<size_t basePageSize = 4096>
     class TwinsMemoryResource : public BaseMemoryResource {
-        std::map<size_t, std::map<std::string, TwinBlock>> blocks;
+        std::unordered_map<size_t, std::unordered_map<std::string, TwinBlock>> blocks;
         public:
             TwinsMemoryResource() : blocks(), BaseMemoryResource() {
                 for (size_t size = basePageSize; size >= 1; size /= 2){
