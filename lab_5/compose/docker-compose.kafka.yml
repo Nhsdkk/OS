@@ -1,0 +1,39 @@
+﻿services:
+    kafka:
+        container_name: kafka
+        image: confluentinc/cp-kafka:7.7.0
+        pull_policy: missing
+        environment:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_LISTENERS: SASL_PLAINTEXT://0.0.0.0:9093, SASL_PLAINTEXT_INNER://0.0.0.0:9092
+          KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: SASL_PLAINTEXT:SASL_PLAINTEXT, SASL_PLAINTEXT_INNER:SASL_PLAINTEXT
+          KAFKA_ADVERTISED_LISTENERS: SASL_PLAINTEXT://localhost:9093, SASL_PLAINTEXT_INNER://kafka:9092
+          KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+          KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
+          KAFKA_INTER_BROKER_LISTENER_NAME: SASL_PLAINTEXT_INNER
+          KAFKA_OPTS: "-Djava.security.auth.login.config=/etc/kafka/jaas.conf -Xmx4G"
+          KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+          KAFKA_NUM_PARTITIONS: 1
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        volumes:
+            - ../env/kafka/kafka_server_jaas.conf:/etc/kafka/jaas.conf
+        ports:
+            - "9092:9092"
+            - "9093:9093"
+        depends_on:
+            - zookeeper
+        networks:
+          - shared
+
+    kafka-ui:
+      container_name: kafka-ui
+      image: provectuslabs/kafka-ui:latest
+      pull_policy: missing
+      ports:
+        - "8080:8080"
+      environment:
+        DYNAMIC_CONFIG_ENABLED: 'true'
+      volumes:
+        - ../env/kafka_ui/dynamic_config.yaml:/etc/kafkaui/dynamic_config.yaml
+      networks:
+        - shared

@@ -10,7 +10,7 @@
 
 namespace Tree{
     template<class T>
-    class Node : public std::enable_shared_from_this {
+    class Node {
         T data;
         std::vector<std::shared_ptr<Node<T>>> children;
         std::shared_ptr<Node<T>> parent;
