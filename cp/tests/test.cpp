@@ -13,29 +13,42 @@ TEST(SimpleAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
         objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
-    std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 100 * sizeof (TestInternal::TestClass));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 2 * 4096);
 
     for (auto i = 0; i < objects.size() - 10; ++i){
         allocator.deallocate(objects[i], 1);
     }
 
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 10 * sizeof (TestInternal::TestClass));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 2 * 4096);
+
     auto val = allocator_int.allocate(1);
+
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 10 * sizeof (TestInternal::TestClass) + sizeof (int));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 2 * 4096);
 
     for (auto i = 0; i < 100 - 10; ++i){
         objects[i] = new (allocator.allocate(1)) TestInternal::TestClass();
     }
 
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 2 * 4096);
+
     for (auto i = 0; i < 100; ++i){
         objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
-    std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 200 * sizeof (TestInternal::TestClass) + sizeof (int));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 4 * 4096);
 
     for (auto obj: objects){
         allocator.deallocate(obj, 1);
     }
 
     allocator_int.deallocate(val, 1);
+
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 0);
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 4 * 4096);
 }
 
 TEST(TwinAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
@@ -48,13 +61,20 @@ TEST(TwinAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
         objects.push_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
-    std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 100 * sizeof (TestInternal::TestClass));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 4 * 4096);
 
     for (auto i = 0; i < objects.size() - 10; ++i){
         allocator.deallocate(objects[i], 1);
     }
 
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 10 * sizeof (TestInternal::TestClass));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 4 * 4096);
+
     auto val = allocator_int.allocate(1);
+
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 10 * sizeof (TestInternal::TestClass) + sizeof (int));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 4 * 4096);
 
     for (auto i = 0; i < 100 - 10; ++i){
         objects[i] = new (allocator.allocate(1)) TestInternal::TestClass();
@@ -64,13 +84,17 @@ TEST(TwinAllocatorTests, ShouldAllocateAndDeallocateCorrectly){
         objects.emplace_back(new (allocator.allocate(1)) TestInternal::TestClass());
     }
 
-    std::cout << "Finished. Total allocated memory: " << memory_resource->getTotalAllocatedMemory() << ". Total used memory: " << memory_resource->getTotalUsedMemory() << std::endl;
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 200 * sizeof (TestInternal::TestClass) + sizeof (int));
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 7 * 4096);
 
     for (auto obj: objects){
         allocator.deallocate(obj, 1);
     }
 
     allocator_int.deallocate(val, 1);
+
+    EXPECT_EQ(memory_resource->getTotalUsedMemory(), 0);
+    EXPECT_EQ(memory_resource->getTotalAllocatedMemory(), 7 * 4096);
 }
 
 
