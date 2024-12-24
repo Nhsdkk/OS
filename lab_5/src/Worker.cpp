@@ -65,6 +65,7 @@ namespace Process {
     std::optional<std::string> Worker::consume() {
         auto msg = std::shared_ptr<RdKafka::Message>(consumer->consume(1000));
         if (msg->err() != RdKafka::ERR_NO_ERROR) {
+            std::cout << msg->errstr() << std::endl;
             return std::nullopt;
         }
 

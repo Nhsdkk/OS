@@ -103,6 +103,8 @@ int main(int argc, char ** argv){
     std::string inputTopic(argv[1]);
     std::string outputTopic(argv[2]);
 
+    std::cout << "FUCK " << inputTopic << ", " << outputTopic << std::endl;
+
     auto worker = std::make_shared<Process::Worker>(id, getpid(), inputTopic, outputTopic);
     std::map<std::string, int> state;
     Tree::Tree<size_t> tree(id);

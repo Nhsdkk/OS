@@ -9,6 +9,9 @@
 #include <string>
 #include <optional>
 #include <utility>
+#include <vector>
+#include <sstream>
+
 namespace Message{
     enum MessageType {
         INPUT,
@@ -36,8 +39,12 @@ namespace Message{
                 for (auto& str: commandText){
                     result << str << " ";
                 }
-                std::string r (result.str());
-                r = r.substr(0, r.size() - 1);
+                std::string r = result.str();
+
+                if (!r.empty()) {
+                    r.pop_back();
+                }
+
                 return r;
             }
             const std::string& getResultText() const {
@@ -46,7 +53,11 @@ namespace Message{
                     result << str << " ";
                 }
                 std::string r (result.str());
-                r = r.substr(0, r.size() - 1);
+
+                if (!r.empty()) {
+                    r.pop_back();
+                }
+
                 return r;
             }
             const std::optional<std::vector<std::string>>& getResultTextSplitted() const { return resultText; }

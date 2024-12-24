@@ -61,12 +61,12 @@ int main(int argv, char** argc){
         auto message = getMessageFromCommand(ctxt);
         auto commandSplitted = message.getCommandTextSplitted();
 
-        if ((commandSplitted[0] == "kill" && !tree.exists(message.getTargetId())) || message.getTargetId() == 0) {
+        if (commandSplitted[0] == "kill" && (!tree.exists(message.getTargetId()) || message.getTargetId() == 0)) {
             std::cout << "Can't kill non-existing node" << std::endl;
             continue;
         }
 
-        if ((commandSplitted[0] == "attach" && tree.exists(message.getTargetId())) || message.getTargetId() == 0){
+        if (commandSplitted[0] == "attach" && (tree.exists(Utils::fromString<size_t>(commandSplitted[2])) || Utils::fromString<size_t>(commandSplitted[2]) == 0)){
             std::cout << "Node already exists" << std::endl;
             continue;
         }
