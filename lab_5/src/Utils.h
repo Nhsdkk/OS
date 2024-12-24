@@ -27,4 +27,12 @@ namespace Utils{
         const std::shared_ptr<RdKafka::Conf>& config
     );
 
+    template<class T>
+    T fromString(const std::string& data){
+        std::istringstream iss(data);
+        T result;
+        iss >> result;
+        return result;
+    }
+
 }

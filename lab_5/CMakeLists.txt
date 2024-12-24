@@ -17,6 +17,8 @@ add_library(src
         src/Worker.h
         src/Utils.cpp
         src/Utils.h
+        src/Message.cpp
+        src/Message.h
 )
 
 target_link_libraries(src PRIVATE rdkafka++)
