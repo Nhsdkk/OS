@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 
         unfinishedRequests.insert(request.getId());
 
-        std::thread([&unfinishedRequests, &request, &tree](){
+        std::thread thread([&unfinishedRequests, &request, &tree](){
             auto start = std::chrono::steady_clock::now();
             while (std::chrono::steady_clock::now() - start < TIMEOUT) {
                 if (unfinishedRequests.contains(request.getId())) {
@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
     };
 
     auto sender = [&tree, &unfinishedRequests](zmq::socket_t* parent, const std::string& message){
-        std::cout<< "Got message: " << message << std::endl;
         Response::Response response = Response::Response::fromStringResponse(message);
+        std::cout<< "Got message: " << split(response.constructResponseString(), '\n')[1] << std::endl;
         auto req = response.getRequest();
         if (req.getCommand() == "create"){
             tree.attach(req.getReceiver(), fromString<size_t>(req.getArgs()[0]));
