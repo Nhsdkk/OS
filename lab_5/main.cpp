@@ -58,17 +58,16 @@ int main(int argc, char** argv) {
 
     auto sender = [&tree, &unfinishedRequests](zmq::socket_t* parent, const std::string& message){
         Response::Response response = Response::Response::fromStringResponse(message);
-        std::cout<< "Got message: " << split(response.constructResponseString(), '\n')[1] << std::endl;
         auto req = response.getRequest();
+        if (!unfinishedRequests.contains(req.getId())) { return; }
+        std::cout<< "Got message: " << split(response.constructResponseString(), '\n')[1] << std::endl;
         if (req.getCommand() == "create"){
             tree.attach(req.getReceiver(), fromString<size_t>(req.getArgs()[0]));
         } else if (req.getCommand() == "kill") {
             tree.remove(req.getReceiver());
         }
 
-        if (unfinishedRequests.contains(req.getId())) {
-            unfinishedRequests.erase(req.getId());
-        }
+        unfinishedRequests.erase(req.getId());
     };
 
     worker.run(receiver, sender);
