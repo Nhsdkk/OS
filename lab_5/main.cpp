@@ -23,10 +23,13 @@ int main(int argc, char** argv) {
         std::getline(std::cin, buffer, '\n');
         auto request = Request::Request::fromStringRequest(buffer, id);
 
-        if (request.getCommand() == "create" && tree.exists(request.getReceiver())) {
-            std::cout << "Node with id " << request.getReceiver() << " already exists" << std::endl;
-            throw std::invalid_argument("Node with id " + std::to_string(request.getReceiver()) + " already exists");
-        } else if (request.getCommand() == "kill" && !tree.exists(request.getReceiver())) {
+        if (request.getCommand() == "create" && tree.exists(fromString<int>(request.getArgs()[0]))) {
+            std::cout << "Node with id " << fromString<int>(request.getArgs()[0]) << " already exists" << std::endl;
+            throw std::invalid_argument("Node with id " + std::to_string(fromString<int>(request.getArgs()[0])) + " already exists");
+        } else if (request.getCommand() == "create" && !tree.exists(request.getReceiver())) {
+            std::cout << "Node with id " << request.getReceiver() << " does not exist (Receiver)" << std::endl;
+            throw std::invalid_argument("Node with id " + std::to_string(request.getReceiver()) + " does not exist (Receiver)");
+        }else if (request.getCommand() == "kill" && !tree.exists(request.getReceiver())) {
             std::cout << "Node with id " << request.getReceiver() << " does not exist" << std::endl;
             throw std::invalid_argument("Node with id " + std::to_string(request.getReceiver()) + " does not exist");
         }
