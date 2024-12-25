@@ -46,7 +46,13 @@ class Response {
             Request::Request req = Request::Request::fromStringRequest(rows[0]);
             std::vector<std::string> parts = split(rows[1], ' ');
             if (parts.size() < 3) throw std::invalid_argument("Invalid response format");
-            return {parts[0] == "SUCCESS" ? SUCCESS : FAILURE, concat(std::vector<std::string>(parts.begin() + 2, parts.end())), fromString<int>(parts[1])};
+            auto response = Response(
+                parts[0] == "SUCCESS" ? SUCCESS : FAILURE,
+                concat(std::vector<std::string>(parts.begin() + 2, parts.end())),
+                fromString<int>(parts[1])
+            );
+            response.setRequest(req);
+            return response;
         }
         static Response generateMalformedResponse(int handlerId) {
             return {FAILURE, "Message malformed", handlerId};
@@ -56,6 +62,9 @@ class Response {
         }
 
         Request::Request getRequest() const { return request; }
+        ResponseType getType() const { return type; }
+        std::string getMessage() const { return message; }
+        int getHandlerId() const { return handlerId; }
 
         void setRequest(const Request::Request& req) { Response::request = req; }
 };

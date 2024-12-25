@@ -8,6 +8,8 @@
 #include "iostream"
 #include "vector"
 
+#include <memory>
+
 namespace Tree {
 
 template<class T>
