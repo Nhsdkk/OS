@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     size_t id = 0;
 
     std::set<size_t> unfinishedRequests;
-    Tree::Tree<size_t> tree(-1);
+    Tree::Tree<int> tree(-1);
 
     auto receiver = [&unfinishedRequests, &id, &tree](zmq::socket_t* parent){
         std::string buffer;
