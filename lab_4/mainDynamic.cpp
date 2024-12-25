@@ -1,0 +1,114 @@
+//
+// Created by nikit on 12/4/2024.
+//
+
+#include <functional>
+#include <istream>
+#include <iostream>
+#include <dlfcn.h>
+
+const inline std::string pathToF1 = "./libf1.so";
+const inline std::string pathToF2 = "./libf2.so";
+
+using PiFuncPointer = float (*)(int a);
+using SortFuncPointer = std::vector<int> (*)(std::vector<int> a);
+
+using PiFunc = std::function<float (int)>;
+using Sorter = std::function<std::vector<int> (std::vector<int>)>;
+
+void handlePi(const PiFunc& CalcPi){
+    int n;
+
+    std::cout << "Enter n: ";
+    std::cin >> n;
+
+    auto result = CalcPi(n);
+    std::cout << "Result: " << result << std::endl;
+}
+
+void handleSort(const Sorter& Sorter){
+    std::vector<int> vec;
+    size_t size;
+
+    std::cout << "Enter size: ";
+    std::cin >> size;
+
+    std::cout << "Enter values separated by space: ";
+    int val;
+    for (auto i = 0; i < size; ++i){
+        std::cin >> val;
+        vec.push_back(val);
+    }
+
+    std::cout << "Sorting..." << std::endl;
+    auto result = Sorter(vec);
+    std::cout << "Result: ";
+    for (auto& item: result) std::cout << item << " ";
+    std::cout << std::endl;
+}
+
+void handlePiDynamic(void* libHandle, const std::string& funcName) {
+    auto pi = reinterpret_cast<PiFuncPointer>(dlsym(libHandle, funcName.c_str()));
+
+    if (!pi) {
+        std::cout << "Error while loading library: Can't use function " << funcName << std::endl;
+        return;
+    }
+
+    handlePi(pi);
+}
+
+void handleSortDynamic(void* libHandle, const std::string& funcName) {
+    auto pi = reinterpret_cast<SortFuncPointer>(dlsym(libHandle, funcName.c_str()));
+
+    if (!pi) {
+        std::cout << "Error while loading library: Can't use function " << funcName << std::endl;
+        return;
+    }
+
+    handleSort(pi);
+}
+
+void* loadLib(const std::string& path){
+    void* libHandle = dlopen(path.c_str(), RTLD_LAZY);
+    if (!libHandle) {
+        std::cout << "Error while loading library: " << dlerror() << std::endl;
+        return nullptr;
+    }
+    return libHandle;
+}
+
+int main(int argv, char** argc){
+    auto command = 0;
+
+    auto libHandle = dlopen(pathToF1.c_str(), RTLD_LAZY);
+    auto isF1 = true;
+    
+    while (command != 5) {
+        std::cout << "Enter command: ";
+        std::cin >> command;
+
+        switch (command) {
+            case 0:
+                if (isF1) {
+                    libHandle = loadLib(pathToF2);
+                    isF1 = false;
+                }
+                else {
+                    libHandle = loadLib(pathToF1);
+                    isF1 = true;
+                }
+                break;
+            case 1:
+                handlePiDynamic(libHandle, isF1 ? "CalcPiLeibniz" : "CalcPiVallis");
+                break;
+            case 2:
+                handleSortDynamic(libHandle, isF1 ? "SortBubble" : "SortHoar");
+                break;
+            default:
+                break;
+        }
+
+        if (command == 3) return 0;
+    }
+}
