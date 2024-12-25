@@ -15,21 +15,11 @@ int main(int argc, char** argv) {
     auto parentPortInput = fromString<int>(argv[1]);
     auto parentPortOutput = fromString<int>(argv[2]);
 
-    {
-        std::ofstream file("worker_" + std::to_string(id) + ".log");
-        file << "Worker started with id: " << id << " parent portInput: " << parentPortInput << " parent portOutput: "
-             << parentPortOutput << std::endl;
-    }
-
     auto worker = Worker::Worker(id, parentPortInput, parentPortOutput);
 
-    auto receiver = [id](zmq::socket_t* parent){
+    auto receiver = [](zmq::socket_t* parent){
         auto message = net::receive(parent);
-        {
-            std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-            file << "Recieved message at " << id << ": " << message << std::endl;
-        }
-        return message;
+        return Request::Request::fromStringRequest(message);
     };
 
     auto sender = [](zmq::socket_t* parent, const std::string& message){

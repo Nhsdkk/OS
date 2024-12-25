@@ -6,7 +6,7 @@ set(SubProjectName "lab_5")
 FetchContent_Declare(
         zeromq
         GIT_REPOSITORY https://github.com/zeromq/libzmq.git
-        GIT_TAG        v4.3.4  # Укажите нужную версию
+        GIT_TAG        v4.3.5  # Укажите нужную версию
 )
 
 FetchContent_MakeAvailable(zeromq)
@@ -32,6 +32,8 @@ add_library(src
     src/constants.h
     src/net.cpp
     src/net.h
+        src/Tree.cpp
+        src/Tree.h
 )
 
 target_link_libraries(src PRIVATE cppzmq)

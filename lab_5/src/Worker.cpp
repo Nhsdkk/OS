@@ -5,7 +5,6 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <map>
 #include <variant>
 #include <thread>
 #include "Worker.h"
@@ -28,21 +27,18 @@ namespace Worker {
     std::variant<Response::Response, Option> Worker::handleCommands(
         const std::string& command,
         const int receiver,
-        const std::vector<std::string>& args
+        const std::vector<std::string>& args,
+        const size_t requestId
     ) {
         if (command == "kill") {
             if (receiver == -1 && id == -1) return Option::BREAK;
             if (receiver != -2) {
                 if (!children.contains(receiver)) return Option::PASS_MESSAGE;
-                return handleKill(receiver);
+                return handleKill(receiver, requestId);
             }
         }
 
         if (receiver != id) {
-            {
-                std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-                file << "PASSING MESSAGE TO CHILD " << std::endl;
-            }
             return Option::PASS_MESSAGE;
         }
 
@@ -53,21 +49,20 @@ namespace Worker {
         } else if (command == "ping"){
             return handlePing();
         } else if (command == "kill") {
-            return handleKill(receiver);
+            return handleKill(receiver, requestId);
         }
 
         std::cout << "Unknown command" << std::endl;
         return Response::Response::generateUnknownCommandResponse(id);
     }
 
-    void Worker::run(const std::function<std::string(zmq::socket_t*)>& receiveData, const std::function<void(zmq::socket_t*, std::string)>& sendResult) {
+    void Worker::run(const std::function<Request::Request(zmq::socket_t*)>& receiveData, const std::function<void(zmq::socket_t*, std::string)>& sendResult) {
         bool finished = false;
         std::thread workerThread([&sendResult, this, &finished](){
             std::string result;
             while(!finished) {
                 try {
                     result = net::receive(&current);
-                    std::cout << "Received result at " << id << ": " << result << std::endl;
                     sendResult(&parentOutput, result);
                 } catch (...) {
                     continue;
@@ -75,38 +70,19 @@ namespace Worker {
             }
         });
 
-        std::string stringCommand;
         while (true) {
             try {
-                stringCommand = receiveData(&parentInput);
-                std::cout << "Received command " << id << ": " << stringCommand << std::endl;
-                auto request = Request::Request::fromStringRequest(stringCommand);
-                auto response = handleCommands(request.getCommand(), request.getReceiver(), request.getArgs());
-                {
-                    std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-                    if (std::holds_alternative<Response::Response>(response)) {
-                        file << "response: " << std::get<Response::Response>(response).constructResponseString() << std::endl;
-                    } else if (std::get<Option>(response) == Option::BREAK) {
-                       file << "response: " << "BREAK" << std::endl;
-                    } else if (std::get<Option>(response) == Option::PASS_MESSAGE) {
-                        file << "response: " << "PASS_MESSAGE" << std::endl;
-                    }
-                }
+                auto request = receiveData(&parentInput);
+                auto response = handleCommands(request.getCommand(), request.getReceiver(), request.getArgs(), request.getId());
                 if (std::holds_alternative<Response::Response>(response)) {
-                    {
-                        std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-                        file << "Sending result of request: " << stringCommand << " Message: " << std::get<Response::Response>(response).constructResponseString() << std::endl;
-                    }
-                    sendResult(&parentOutput, std::get<Response::Response>(response).constructResponseString());
+                    auto res = std::get<Response::Response>(response);
+                    res.setRequest(request);
+                    sendResult(&parentOutput, res.constructResponseString());
                 } else if (std::get<Option>(response) == Option::BREAK) {
                     break;
                 } else if (std::get<Option>(response) == Option::PASS_MESSAGE) {
                     for (auto &child : children) {
-                        {
-                            std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-                            file << "Passing request: " << stringCommand << " To port: " << childrenPorts[child.first] << std::endl;
-                        }
-                        net::send_message(child.second, stringCommand);
+                        net::send_message(child.second, request.toString());
                     }
                 }
             } catch (std::exception& e) {
@@ -124,16 +100,7 @@ namespace Worker {
     }
 
     Response::Response Worker::handleCreate(const std::vector<std::string> &args) {
-        {
-            std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-            file << "handling create with arg size: " << args.size() << std::endl;
-        }
         if (args.size() != 1) return Response::Response::generateMalformedResponse(id);
-
-        {
-            std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-            file << "handling create with arg size(Passed arg check): " << args.size() << " They are: " <<args[0] << std::endl;
-        }
 
         auto childId = fromString<int>(args[0]);
         children.insert({childId, new zmq::socket_t(context, ZMQ_DEALER)});
@@ -143,20 +110,14 @@ namespace Worker {
         if (pid == -1) return {Response::FAILURE, "Failed to create process for worker with id " + args[0], id};
         children[childId]->setsockopt(ZMQ_RCVTIMEO, 3000);
 
-        {
-            std::ofstream file("worker_" + std::to_string(id) + ".log", std::ios::app);
-            file << "childrenSize: " << children.size() << std::endl;
-            file << "childrenPortSize: " << childrenPorts.size() << std::endl;
-        }
-
         return {Response::SUCCESS, "Worker with id " + args[0] + " created (pid - " + std::to_string(pid) + ")", id};
     }
 
-    Response::Response Worker::handleKill(int receiver) {
+    Response::Response Worker::handleKill(int receiver, size_t requestId) {
         if (receiver != -2) {
             Response::Response msg;
             try {
-                net::send_message(children[receiver], Request::Request("kill", {}, -2).toString());
+                net::send_message(children[receiver], Request::Request("kill", {}, -2, requestId).toString());
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             } catch (...) {}
             net::unbind(children[receiver], childrenPorts[receiver]);
@@ -168,7 +129,7 @@ namespace Worker {
 
         for (const auto& [childId, child] : children) {
             net::send_message(&parentOutput, Response::Response(Response::ResponseType::SUCCESS, "Killed", id).constructResponseString());
-            net::send_message(child, Request::Request("kill", {}, -2).toString());
+            net::send_message(child, Request::Request("kill", {}, -2, requestId).toString());
             net::unbind(child, childrenPorts[childId]);
             child->close();
         }

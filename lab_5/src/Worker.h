@@ -39,7 +39,8 @@ namespace Worker {
             std::variant<Response::Response, Option> handleCommands(
                 const std::string& command,
                 int receiver,
-                const std::vector<std::string>& args
+                const std::vector<std::string>& args,
+                size_t requestId
             );
             Response::Response handleExec(
                 const std::vector<std::string>& args
@@ -48,7 +49,7 @@ namespace Worker {
                 const std::vector<std::string>& args
             );
             Response::Response handlePing() const;
-            Response::Response handleKill(int receiver);
+            Response::Response handleKill(int receiver, size_t requestId);
         public:
             Worker() : id(-1), context(), children(), childrenPorts(), parentPortInput(-1), parentPortOutput(-1), parentInput(), parentOutput(), data() {
                 current = zmq::socket_t(context, ZMQ_DEALER);
@@ -68,17 +69,12 @@ namespace Worker {
                 if (id != -1){
                     net::connect(&parentOutput, parentPortOutput);
                     net::connect(&parentInput, parentPortInput);
-                    {
-                        std::ofstream file("worker_" + std::to_string(id) + ".log");
-                        file << "Worker connected with id: " << id << " to parent portInput: " << parentPortInput << " to parent portOutput: "
-                             << parentPortOutput << std::endl;
-                    }
                 }
 
                 current = zmq::socket_t(context, ZMQ_DEALER);
                 currentPort = net::bind(&current, id);
             }
-            void run(const std::function<std::string(zmq::socket_t*)>& receiveData, const std::function<void(zmq::socket_t*, std::string)>& sendResult);
+            void run(const std::function<Request::Request(zmq::socket_t*)>& receiveData, const std::function<void(zmq::socket_t*, std::string)>& sendResult);
             ~Worker() = default;
     };
 
