@@ -17,7 +17,9 @@ int main(int argc, char** argv) {
     std::set<size_t> unfinishedRequests;
     Tree::Tree<int> tree(-1);
 
-    auto receiver = [&unfinishedRequests, &id, &tree](zmq::socket_t* parent){
+    std::vector<std::thread> threads;
+
+    auto receiver = [&threads,&unfinishedRequests, &id, &tree](zmq::socket_t* parent){
         std::string buffer;
         std::cout << "Enter message: ";
         std::getline(std::cin, buffer, '\n');
@@ -45,11 +47,14 @@ int main(int argc, char** argv) {
                     return;
                 }
             }
-
-            tree.remove(request.getReceiver());
+            if (tree.exists(request.getReceiver())){
+                tree.remove(request.getReceiver());
+            }
             unfinishedRequests.erase(request.getId());
             std::cout << "Request \"" << request.toString() << "\" timed out" << std::endl;
         });
+
+        threads.push_back(std::move(thread));
 
         id++;
 
@@ -71,4 +76,8 @@ int main(int argc, char** argv) {
     };
 
     worker.run(receiver, sender);
+
+    for (auto& thread: threads){
+        thread.join();
+    }
 }

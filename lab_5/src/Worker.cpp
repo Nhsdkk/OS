@@ -92,6 +92,8 @@ namespace Worker {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
 
+        workerThread.join();
+
         std::cout << "Terminating worker with id " << id << std::endl;
     }
 

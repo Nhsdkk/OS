@@ -36,7 +36,7 @@ class Request {
         }
 
         std::string toString() {
-            std::string result = command + " " + std::to_string(receiver);
+            std::string result = std::to_string(id) + " " + command + " " + std::to_string(receiver);
             for (const auto& arg : args) result += " " + arg;
             return result;
         }
