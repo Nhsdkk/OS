@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
             }
 
             tree.remove(request.getReceiver());
+            unfinishedRequests.erase(request.getId());
             std::cout << "Request \"" << request.toString() << "\" timed out" << std::endl;
         });
 
