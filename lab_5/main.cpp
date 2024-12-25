@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
         if (!unfinishedRequests.contains(req.getId())) { return; }
         std::cout<< "Got message: " << split(response.constructResponseString(), '\n')[1] << std::endl;
         if (req.getCommand() == "create"){
-            tree.attach(req.getReceiver(), fromString<size_t>(req.getArgs()[0]));
+            tree.attach(req.getReceiver(), fromString<int>(req.getArgs()[0]));
         } else if (req.getCommand() == "kill") {
             tree.remove(req.getReceiver());
         }
