@@ -1,38 +1,47 @@
-#pragma once
+//
+// Created by nikit on 12/24/2024.
+//
+
+#ifndef OS_LAB_5_SRC_UTILS_H_
+#define OS_LAB_5_SRC_UTILS_H_
+
+#include <vector>
 #include <string>
-#include <csignal>
-#include <iostream>
-#include <memory>
 #include <sstream>
-#include "../../cmake-build-debug/_deps/librdkafka-src/src-cpp/rdkafkacpp.h"
+#include <csignal>
 
-constexpr int ERROR = -1;
-constexpr int CHILD_PROCESS = 0;
+inline std::vector<std::string> split(const std::string &data, char splitter) {
+    std::istringstream iss(data);
+    std::string buffer;
+    std::vector<std::string> result;
+    while (getline(iss, buffer, splitter)){
+        result.push_back(buffer);
+    }
+    return result;
+}
 
-namespace Utils{
+template<class T>
+inline T fromString(const std::string& data){
+    std::istringstream iss(data);
+    T result;
+    iss >> result;
+    return result;
+}
 
-    std::vector<std::string> split(const std::string& data, char splitter);
+inline int startProcess(const std::string &childPath, const size_t id, const int parentPortInput, const int parentPortOutput) {
+    pid_t pid = fork();
 
-    size_t startProcess(const std::string &childPath, size_t id, const std::string& inputTopic, const std::string& outputTopic);
-
-    std::shared_ptr<RdKafka::Conf> createConfig(const std::string& broker, const std::string& groupId);
-
-    std::shared_ptr<RdKafka::KafkaConsumer> createConsumer(const std::shared_ptr<RdKafka::Conf>& config, const std::vector<std::shared_ptr<RdKafka::Topic>>& topics);
-
-    std::shared_ptr<RdKafka::Producer> createProducer(const std::shared_ptr<RdKafka::Conf>& config);
-
-    std::shared_ptr<RdKafka::Topic> createTopic(
-        const std::shared_ptr<RdKafka::Producer>& producer,
-        const std::string& topicName,
-        const std::shared_ptr<RdKafka::Conf>& config
-    );
-
-    template<class T>
-    T fromString(const std::string& data){
-        std::istringstream iss(data);
-        T result;
-        iss >> result;
-        return result;
+    if (pid == -1){
+        return -1;
     }
 
+    if (pid == 0){
+        if (execl(childPath.c_str(),  std::to_string(id).c_str(), std::to_string(parentPortInput).c_str(), std::to_string(parentPortOutput).c_str(), nullptr) == -1){
+            return -1;
+        }
+    }
+
+    return pid;
 }
+
+#endif //OS_LAB_5_SRC_UTILS_H_

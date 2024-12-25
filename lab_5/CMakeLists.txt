@@ -2,39 +2,48 @@ cmake_minimum_required(VERSION 3.10)
 
 set(SubProjectName "lab_5")
 
+# Загрузка и сборка ZeroMQ
 FetchContent_Declare(
-        librdkafka
-        GIT_REPOSITORY https://github.com/edenhill/librdkafka.git
-        GIT_TAG        v2.2.0
+        zeromq
+        GIT_REPOSITORY https://github.com/zeromq/libzmq.git
+        GIT_TAG        v4.3.4  # Укажите нужную версию
 )
 
-FetchContent_MakeAvailable(librdkafka)
+FetchContent_MakeAvailable(zeromq)
+
+# Загрузка и сборка cppzmq
+FetchContent_Declare(
+        cppzmq
+        GIT_REPOSITORY https://github.com/zeromq/cppzmq.git
+        GIT_TAG        v4.8.0  # Укажите нужную версию
+)
+
+FetchContent_MakeAvailable(cppzmq)
 
 add_library(src
-        src/Tree.cpp
-        src/Tree.h
-        src/Worker.cpp
-        src/Worker.h
-        src/Utils.cpp
-        src/Utils.h
-        src/Message.cpp
-        src/Message.h
+    src/Worker.cpp
+    src/Worker.h
+    src/Utils.cpp
+    src/Utils.h
+    src/Response.cpp
+    src/Response.h
+    src/Request.cpp
+    src/Request.h
+    src/constants.h
+    src/net.cpp
+    src/net.h
 )
 
-target_link_libraries(src PRIVATE rdkafka++)
+target_link_libraries(src PRIVATE cppzmq)
 
-add_library(master_node
-        src/MasterNode.cpp
-        src/MasterNode.h
+add_executable(child
+    child.cpp
 )
 
-target_link_libraries(master_node PRIVATE src)
-
-add_executable(child src/child.cpp)
-target_link_libraries(child PRIVATE src)
+target_link_libraries(child PRIVATE src cppzmq)
 
 add_executable(lab_5 main.cpp)
-target_link_libraries(lab_5 PRIVATE master_node)
+target_link_libraries(lab_5 PRIVATE src cppzmq)
 
 add_dependencies(lab_5 child)
 

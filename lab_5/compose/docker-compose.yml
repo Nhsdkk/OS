@@ -1,7 +1,0 @@
-include:
-  - "./docker-compose.kafka.yml"
-  - "./docker-compose.zookeeper.yml"
-
-networks:
-  shared:
-    driver: bridge
