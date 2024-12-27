@@ -14,15 +14,18 @@ namespace Memory {
     class BaseMemoryResource : public std::pmr::memory_resource {
         size_t totalAllocatedMemory;
         size_t totalUsedMemory;
+        size_t allocatedObjects;
 
         protected:
             std::vector<Utils::Page> pages;
             void setTotalUsedMemory(size_t val) { totalUsedMemory = val; }
             void setTotalAllocatedMemory(size_t val)  { totalAllocatedMemory = val; }
+            void setAllocatedObjects(const size_t val) { allocatedObjects = val; }
         public:
             BaseMemoryResource(): pages(), totalUsedMemory(0), totalAllocatedMemory(0) {}
             size_t getTotalUsedMemory() const { return totalUsedMemory; }
             size_t getTotalAllocatedMemory() const { return totalAllocatedMemory; }
+            size_t getAllocatedObjects() const { return allocatedObjects; }
             virtual void * do_allocate(std::size_t bytes, std::size_t alignment) override = 0;
             void do_deallocate(void *p, std::size_t bytes, std::size_t alignment) override = 0;
             virtual bool do_is_equal(const std::pmr::memory_resource &other) const noexcept override = 0;

@@ -125,6 +125,7 @@ namespace Memory {
                 if (allocatedSize.has_value()) setTotalAllocatedMemory(getTotalAllocatedMemory() + allocatedSize.value());
                 auto [start, page] = blocks.at(sz).at(idx).use();
                 setTotalUsedMemory(getTotalUsedMemory() + bytes);
+                setAllocatedObjects(getAllocatedObjects() + 1);
                 return pages[page].get() + start;
             }
 
@@ -145,6 +146,7 @@ namespace Memory {
                 setTotalUsedMemory(getTotalUsedMemory() - bytes);
 
                 reCouple(blocks, idx.value(), sz, basePageSize);
+                setAllocatedObjects(getAllocatedObjects() - 1);
             }
 
             bool do_is_equal(const std::pmr::memory_resource &other) const noexcept override {

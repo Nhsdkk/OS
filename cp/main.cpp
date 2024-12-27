@@ -6,35 +6,17 @@
 #include "src/TwinsMemoryResource.h"
 #include "src/Benchmark.h"
 
-void benchmark(size_t iterations){
-    std::cout << "Running benchmark for " << iterations << " iterations" << std::endl;
-    auto simpleMemRes = new Memory::SimpleMemoryResource();
-    auto twinsMemRes = new Memory::TwinsMemoryResource();
-
-    std::ofstream file;
-    file.open("data.txt", std::ios_base::app);
-
-    auto [timeSimple, usedMemSimple] = Utils::measure_time([&simpleMemRes, iterations](){
-      return Benchmark::benchmark_allocator<TestInternal::TestClass>(iterations, simpleMemRes);
-    });
-
-    auto [timeTwin, usedMemTwin] = Utils::measure_time([&twinsMemRes, iterations](){
-      return Benchmark::benchmark_allocator<TestInternal::TestClass>(iterations, twinsMemRes);
-    });
-
-    file << iterations << " ";
-    file << timeSimple << " " << simpleMemRes->getTotalAllocatedMemory() << " " << usedMemSimple << " ";
-    file << timeTwin << " " << twinsMemRes->getTotalAllocatedMemory() << " " << usedMemTwin;
-    file << std::endl;
-}
-
 int main(int argv, char** argc){
-    {
-        std::ofstream file;
-        file.open("data.txt", std::ios_base::app);
-        file << "allocations timeSimple allocatedMemorySimple usedMemSimple timeTwin allocatedMemoryTwin usedMemTwin" << std::endl;
+    auto rnd = Utils::RandomNumberGenerator();
+    std::vector<Command> commands;
+    const size_t commandCount = 1000000;
+    const size_t baseObjectCount = 0;
+
+    commands.reserve(commandCount);
+    for (auto i = 0; i < commandCount; ++i){
+        commands.push_back(rnd.generateEnum<Command>(2));
     }
-    for (auto i = 10; i < 10000; i+=10){
-        benchmark(i);
-    }
+
+    Benchmark::benchmark_allocator("simple_memory_resource.txt", new Memory::SimpleMemoryResource(), commands, baseObjectCount);
+    Benchmark::benchmark_allocator("twins_memory_resource.txt", new Memory::TwinsMemoryResource(), commands, baseObjectCount);
 }

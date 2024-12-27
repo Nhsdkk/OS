@@ -19,6 +19,8 @@ add_library(src
         src/TwinBlock.h
         src/Benchmark.cpp
         src/Benchmark.h
+        src/RandomNumberGenerator.cpp
+        src/RandomNumberGenerator.h
 )
 
 add_executable(cp main.cpp)

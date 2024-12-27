@@ -51,12 +51,14 @@ namespace Memory {
                     std::sort(blocks.begin(), blocks.end());
                     setTotalUsedMemory(getTotalUsedMemory() + bytes);
                     setTotalAllocatedMemory(getTotalAllocatedMemory() + basePageSize);
+                    setAllocatedObjects(getAllocatedObjects() + 1);
                     return pages[block.get_page()].get() + block.get_start();
                 }
 
                 if (blocks[emplaceBlockIdx].get_size() == bytes) {
                     blocks[emplaceBlockIdx].set_used(true);
                     setTotalUsedMemory(getTotalUsedMemory() + bytes);
+                    setAllocatedObjects(getAllocatedObjects() + 1);
                     return pages[block.get_page()].get() + block.get_start();
                 }
 
@@ -64,6 +66,7 @@ namespace Memory {
                 blocks.push_back(block);
                 std::sort(blocks.begin(), blocks.end());
                 setTotalUsedMemory(getTotalUsedMemory() + bytes);
+                setAllocatedObjects(getAllocatedObjects() + 1);
                 return pages[block.get_page()].get() + block.get_start();
             }
 
@@ -97,6 +100,7 @@ namespace Memory {
 
                 setTotalUsedMemory(getTotalUsedMemory() - bytes);
                 std::sort(blocks.begin(), blocks.end());
+                setAllocatedObjects(getAllocatedObjects() - 1);
             }
 
             bool do_is_equal(const std::pmr::memory_resource &other) const noexcept override {
