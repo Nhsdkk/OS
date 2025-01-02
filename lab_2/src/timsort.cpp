@@ -23,21 +23,7 @@ struct MergeParams {
     size_t end2;
 };
 
-//enum SortedType {
-//    Greater,
-//    Less
-//};
-
 namespace timsort {
-
-//    size_t getMinrun(size_t array_size) {
-//        size_t f = 0;
-//        while (array_size >= 64) {
-//            f |= array_size & 1;
-//            array_size >>= 1;
-//        }
-//        return array_size + f;
-//    }
 
     size_t getSplits(std::queue<std::pair<size_t, size_t>>* splits, size_t size, size_t threads = 8) {
         size_t curI = 0;
@@ -86,7 +72,6 @@ namespace timsort {
         auto p = static_cast<InsertParams*>(params);
         insertionSort(p->values, p->start, p->end);
         std::free(params);
-//        sem_post(&sem);
         return nullptr;
     }
 
@@ -130,7 +115,6 @@ namespace timsort {
         auto p = static_cast<MergeParams*>(params);
         mergeSort(p->values, p->start1, p->end1, p->start2, p->end2);
         std::free(params);
-//        sem_post(&sem);
         return nullptr;
     }
 
@@ -171,7 +155,6 @@ namespace timsort {
         int semVal;
 
         while (!splits.empty()){
-//            sem_wait(&sem);
             sem_getvalue(&sem, &semVal);
             auto p = splits.front();
             splits.pop();
@@ -191,7 +174,6 @@ namespace timsort {
                 size_t end = std::min(start + 2 * mergeSize, size);
 
                 if (mid < end) {
-//                    sem_wait(&sem);
                     auto params = new MergeParams{ values, start, mid, mid, end };
                     pthread_create(&threads[threadCount], nullptr, mergeSortThread, params);
                     ++threadCount;
